@@ -1,8 +1,15 @@
+import 'dart:collection';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:sozluk_uygulamasi/Kelimeler.dart';
 import 'package:sozluk_uygulamasi/Kelimelerdao.dart';
 import 'package:sozluk_uygulamasi/detay_page.dart';
-void main() {
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -28,15 +35,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  var refKelimeler = FirebaseDatabase.instance.ref("kelimeler");
+  Future<void> kayit() async {
+    var bilgi = HashMap<String, dynamic>();
+    bilgi["kisi_yas"] = 26;
+    bilgi["kisi_ad"] = "Hakan";
+    refKelimeler.push().set(bilgi);
+  }
+
   bool aramaState = false;
   String aramaWord = "";
   final _form = GlobalKey<FormState>();
-
-  Future<List<Kelimeler>> kelimeleriGetir() async {
-    var kelimeler = Kelimelerdao().tumKelimeler();
-
-    return kelimeler;
-  }
 
   Future<List<Kelimeler>> kelimeArama(String kelime) async {
     var kelimeler = Kelimelerdao().kelimeAra(kelime);
@@ -85,14 +94,33 @@ class _MyHomePageState extends State<MyHomePage> {
                   icon: Icon(Icons.search))
         ],
       ),
-      body: FutureBuilder<List<Kelimeler>>(
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            var kelimeler = snapshot.data;
+      body: StreamBuilder<DatabaseEvent>(
+        stream: refKelimeler.onValue,
+        builder: (context,event){
+          if(event.hasData){
+            var kelimelerListesi = <Kelimeler>[];
+
+            var gelenDegerler = event.data!.snapshot.value as dynamic;
+
+            if(gelenDegerler != null){
+              gelenDegerler.forEach((key,nesne){
+
+                var gelenKelime = Kelimeler.fromJson(key, nesne);
+
+                if(aramaState){
+                  if(gelenKelime.ingilizce.contains(aramaWord)){
+                    kelimelerListesi.add(gelenKelime);
+                  }
+                }else{
+                  kelimelerListesi.add(gelenKelime);
+                }
+
+              });
+            }
             return ListView.builder(
-                itemCount: kelimeler!.length,
+                itemCount:  kelimelerListesi.length,
                 itemBuilder: (context, index) {
-                  var kelime = kelimeler[index];
+                  var kelime = kelimelerListesi[index];
                   return GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -120,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
             return Center();
           }
         },
-        future: aramaState ? kelimeArama(aramaWord) : kelimeleriGetir(),
+      
       ),
     );
   }
