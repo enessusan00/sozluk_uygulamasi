@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:sozluk_uygulamasi/kelime.dart';
+import 'package:sozluk_uygulamasi/Kelimeler.dart';
+
 
 class DetayPage extends StatefulWidget {
-  Kelime kelime;
-  DetayPage(this.kelime);
+  Kelimeler kelimeler;
+  DetayPage(this.kelimeler);
   @override
   State<DetayPage> createState() => _DetayPageState();
 }
@@ -21,11 +22,11 @@ class _DetayPageState extends State<DetayPage> {
         child:
             Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
           Text(
-            widget.kelime.ingilizce,
+            widget.kelimeler.ingilizce,
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40),
           ),
           Text(
-            widget.kelime.turkce,
+            widget.kelimeler.turkce,
             style: TextStyle(   fontSize: 40),
           ),
         ]),

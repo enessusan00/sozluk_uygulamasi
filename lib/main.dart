@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:sozluk_uygulamasi/Kelimeler.dart';
+import 'package:sozluk_uygulamasi/Kelimelerdao.dart';
 import 'package:sozluk_uygulamasi/detay_page.dart';
-import 'package:sozluk_uygulamasi/kelime.dart';
-import 'package:sozluk_uygulamasi/kelime_dao.dart';
-
 void main() {
   runApp(const MyApp());
 }
@@ -33,14 +32,14 @@ class _MyHomePageState extends State<MyHomePage> {
   String aramaWord = "";
   final _form = GlobalKey<FormState>();
 
-  Future<List<Kelime>> kelimeleriGetir() async {
-    var kelimeler = KelimeDao().tumKelimeler();
+  Future<List<Kelimeler>> kelimeleriGetir() async {
+    var kelimeler = Kelimelerdao().tumKelimeler();
 
     return kelimeler;
   }
 
-  Future<List<Kelime>> kelimeArama(String kelime) async {
-    var kelimeler = KelimeDao().kelimeArama(kelime);
+  Future<List<Kelimeler>> kelimeArama(String kelime) async {
+    var kelimeler = Kelimelerdao().kelimeAra(kelime);
 
     return kelimeler;
   }
@@ -86,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   icon: Icon(Icons.search))
         ],
       ),
-      body: FutureBuilder<List<Kelime>>(
+      body: FutureBuilder<List<Kelimeler>>(
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             var kelimeler = snapshot.data;
